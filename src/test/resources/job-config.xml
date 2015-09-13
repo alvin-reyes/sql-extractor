@@ -1,0 +1,74 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch
+	http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	http://www.springframework.org/schema/util 
+	http://www.springframework.org/schema/util/spring-util-3.2.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.2.xsd" >
+
+	
+	<import resource="job-repo-config.xml"/>
+	<context:annotation-config/>
+	
+	<batch:job id="extract_job">
+		
+		<batch:step id="step1">
+			<batch:tasklet>
+				<batch:chunk reader="flatFileReader" processor="extractProcessor" writer="extractWriter" commit-interval="5"></batch:chunk>
+			</batch:tasklet>
+		</batch:step>
+
+	</batch:job>
+
+	<!-- Custom Beans -->
+	
+
+	<!-- Reader: Map each config to an object! -->
+	<bean id="extractConfigLine" class="com.areyes1.ext.obj.ExtractConfigLine" ></bean>
+	<bean id="flatFileReader" class="org.springframework.batch.item.file.FlatFileItemReader"
+		scope="step">
+		<property name="resource" ref="inputFile" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean
+						class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="names">
+							<value>databaseId,componentType,componentValue</value>
+						</property>
+						<property name="delimiter" value="," />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+						<property name="prototypeBeanName" value="extractConfigLine" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	<bean id="inputFile" class="org.springframework.core.io.FileSystemResource" scope="step">
+		<constructor-arg value="#{jobParameters['properties_location']}" />
+	</bean>
+	
+	<bean id="xmlLocationConfig" class="java.lang.String" >
+		<constructor-arg value="#{systemProperties['xmlDatabaseConfig']}" />
+	</bean>
+	
+	<bean id="extractToWhere" class="java.lang.String" >
+		<constructor-arg value="#{systemProperties['extractToWhere']}" />
+	</bean>
+	
+	
+	<!-- Processors: Process each item before writing them! -->
+	<bean id="extractProcessor"  class="com.areyes1.ext.processor.ExtractorItemProcessor"></bean>
+	
+	<!-- Writers -->
+	<bean id="extractWriter" class="com.areyes1.ext.writer.ExtractorWriter"></bean>
+
+</beans>

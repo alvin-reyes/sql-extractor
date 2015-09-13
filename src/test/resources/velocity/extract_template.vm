@@ -1,0 +1,8 @@
+--	SQL 
+begin transaction
+#foreach($item in $items)
+    #foreach($line in $item.sqlInsertLine.get(0))
+    	$line.sqlString
+    #end
+#end
+commit transaction

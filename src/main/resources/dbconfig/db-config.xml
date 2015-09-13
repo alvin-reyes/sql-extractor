@@ -1,0 +1,20 @@
+<config>
+	<databases>
+		<database>
+			<id>DB1</id>
+			<url>URLSAMPLE</url>
+			<name>sasas</name>
+			<username>areyes1</username>
+			<password>Sample</password> <!--  Encrypted -->
+			<driver>oracle.jdbc.driver.OracleDriver</driver> <!-- Make sure to include the driver on the classpath! -->
+		</database>
+		<database>
+			<id>DB2</id>
+			<url>URLSAMPLE</url>
+			<name>sasas</name>
+			<username>areyes1</username>
+			<password>Sample</password> <!--  Encrypted -->
+			<driver>oracle.jdbc.driver.OracleDriver</driver> <!-- Make sure to include the driver on the classpath! -->
+		</database>
+	</databases>
+</config>
