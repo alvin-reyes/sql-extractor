@@ -1,9 +1,9 @@
 package com.areyes1.ext.util;
 
-import java.io.UnsupportedEncodingException;
+import java.security.Key;
 
-import org.apache.commons.lang.StringUtils;
-import org.springframework.util.Base64Utils;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import com.thoughtworks.xstream.core.util.Base64Encoder;
 
@@ -12,39 +12,32 @@ import com.thoughtworks.xstream.core.util.Base64Encoder;
  */
 public class EnDecrypt {
 	
-	/** The salt. */
-	private static String SALT = "";
-	
-	/**
-	 * Encrypt.
-	 *
-	 * @param str the str
-	 * @return the string
-	 */
-	public static String encrypt(String str) {
+	private static final String ALGORITHM = "AES";
+	private static final byte[] keyValue = 
+	    new byte[] { 'T', 'h', 'i', 's', 'I', 's', 'A', 'S', 'e', 'c', 'r', 'e', 't', 'K', 'e', 'y' };
 
-		byte[] bytes = null;
-		String encoded = null;
-		try {
-			bytes = str.getBytes("UTF-8");
-			encoded = new Base64Encoder().encode(bytes);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		
-		
-		return encoded;
+	 public static String encrypt(String valueToEnc) throws Exception {
+	    Key key = generateKey();
+	    Cipher c = Cipher.getInstance(ALGORITHM);
+	    c.init(Cipher.ENCRYPT_MODE, key);
+	    byte[] encValue = c.doFinal(valueToEnc.getBytes());
+	    String encryptedValue = new Base64Encoder().encode(encValue);
+	    return encryptedValue;
 	}
-	
-	/**
-	 * Decrypt.
-	 *
-	 * @param str the str
-	 * @return the string
-	 */
-	public static String decrypt(String str) {
-		return "";
-		//return org.springframework.util.StringUtils.newStringUtf8(Base64Utils.decodeFromString(str));
+
+	public static String decrypt(String encryptedValue) throws Exception {
+	    Key key = generateKey();
+	    Cipher c = Cipher.getInstance(ALGORITHM);
+	    c.init(Cipher.DECRYPT_MODE, key);
+	    byte[] decordedValue = new Base64Encoder().decode(encryptedValue);
+	    byte[] decValue = c.doFinal(decordedValue);
+	    String decryptedValue = new String(decValue);
+	    return decryptedValue;
+	}
+
+	private static Key generateKey() throws Exception {
+	    Key key = new SecretKeySpec(keyValue, ALGORITHM);
+	    return key;
 	}
 
 	
@@ -54,7 +47,17 @@ public class EnDecrypt {
 	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
-		System.out.println(encrypt("pass"));
-		System.out.println(decrypt("cGFzcw=="));
+		try {
+			System.out.println(encrypt("password1"));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			System.out.println(decrypt("LxgljnYkS8KvO6IsmU1hGQ=="));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

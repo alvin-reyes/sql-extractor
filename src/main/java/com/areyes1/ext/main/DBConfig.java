@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.sql.DataSource;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -18,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import com.areyes1.ext.obj.DatabaseConfiguration;
+import com.areyes1.ext.util.EnDecrypt;
 
 /**
  * The Class DBConfig.
@@ -79,15 +82,19 @@ public class DBConfig {
 			List<Element> list = rootNode.getChildren("database");
 			
 			for (int i = 0; i < list.size(); i++) {
-				DatabaseConfiguration dbConfig = new DatabaseConfiguration();
-				Element node = (Element) list.get(i);				
-				dbConfig.setId(node.getChildText("id"));
-				dbConfig.setDatabase(node.getChildText("name"));
-				dbConfig.setDbConnUrl(node.getChildText("url"));
-				dbConfig.setDbUserName(node.getChildText("username"));
-				dbConfig.setDbPassword(node.getChildText("password"));
-				dbConfig.setDriver(node.getChildText("driver"));
-				arrList.add(dbConfig);				
+				try {
+					DatabaseConfiguration dbConfig = new DatabaseConfiguration();
+					Element node = (Element) list.get(i);				
+					dbConfig.setId(node.getChildText("id"));
+					dbConfig.setDatabase(node.getChildText("name"));
+					dbConfig.setDbConnUrl(node.getChildText("url"));
+					dbConfig.setDbUserName(node.getChildText("username"));					
+					dbConfig.setDbPassword(EnDecrypt.decrypt(node.getChildText("password")));
+					dbConfig.setDriver(node.getChildText("driver"));
+					arrList.add(dbConfig);		
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 
 		} catch (IOException io) {

@@ -3,6 +3,10 @@ package com.areyes1.ext.main;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AppConfigEntryTest.
+ */
 public class AppConfigEntryTest {
 
 	/**
